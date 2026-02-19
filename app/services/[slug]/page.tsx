@@ -12,7 +12,7 @@ import RelatedServices from "@/components/sections/RelatedServices";
 import ServiceBookingCTA from "@/components/sections/ServiceBookingCTA";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -22,7 +22,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const service = getServiceBySlug(params.slug);
+  const { slug } = await params;
+  const service = getServiceBySlug(slug);
 
   if (!service) {
     return {
@@ -41,8 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ServiceDetailPage({ params }: Props) {
-  const service = getServiceBySlug(params.slug);
+export default async function ServiceDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const service = getServiceBySlug(slug);
 
   if (!service) {
     notFound();
@@ -61,7 +63,7 @@ export default function ServiceDetailPage({ params }: Props) {
       <ServiceBookingCTA
         title={`Ready to Experience ${service.name}?`}
         subtitle="Book your session today and begin your journey to wellness."
-        primaryButtonHref={`/booking?service=${service.id}`}
+        primaryButtonHref={`/booking?service=${service.slug}`}
       />
     </main>
   );
